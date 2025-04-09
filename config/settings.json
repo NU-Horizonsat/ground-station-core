@@ -1,0 +1,22 @@
+{
+    "api": {
+      "host": "localhost",
+      "port": 25565
+    },
+    "ground_station": {
+      "name": "My Ground Station",
+      "latitude": 37.7749,
+      "longitude": -122.4194,
+      "elevation": 10.0
+    },
+    "influxdb": {
+      "url": "http://localhost:8086",
+      "token": "your_token_here",
+      "org": "your_org",
+      "bucket": "satellite_telemetry"
+    },
+    "paths": {
+      "influxdb": "C:\\Program Files\\InfluxDB\\influxd.exe",
+      "grafana": "C:\\Program Files\\GrafanaLabs\\grafana\\bin\\grafana-server.exe"
+    }
+  }
