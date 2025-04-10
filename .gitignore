@@ -1,2 +1,6 @@
 # The .gitignore file stops the build directory from uploading to GitHub
 build
+*.pyc
+*.pyo
+*.pyd
+__pycache__

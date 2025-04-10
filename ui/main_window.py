@@ -2,13 +2,13 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from ui.command_panel import CommandPanel
-from ui.telemetry_panel import TelemetryPanel
-from ui.schedule_panel import SchedulePanel
-from ui.pass_panel import PassPanel
-from ui.position_panel import PositionPanel
-from ui.services_panel import ServicesPanel
-from ui.gsclient import GroundStationClient
+from command_panel import CommandPanel
+from telemetry_panel import TelemetryPanel
+from schedule_panel import SchedulePanel
+from pass_panel import PassPanel
+from position_panel import PositionPanel
+from services_panel import ServicesPanel
+from gsclient import GroundStationClient
 
 class MainWindow:
     def __init__(self, root, config):

@@ -5,7 +5,7 @@ import sys
 import json
 import tkinter as tk
 import ttkbootstrap as ttk
-from ui.main_window import MainWindow
+from main_window import MainWindow
 
 def load_config():
     """Load configuration from JSON file"""
