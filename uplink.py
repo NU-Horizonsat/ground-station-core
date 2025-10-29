@@ -1,24 +1,29 @@
+#!/usr/bin/env python3
+"""
+Satellite Uplink Module - Sends commands to satellites using SDR and CCSDS standards
+"""
+
 import time
 import struct
 import logging
 import numpy as np
 from enum import Enum, auto
 from typing import List, Dict, Optional, Union, Tuple
-import SoapySDR
-from SoapySDR import SOAPY_SDR_TX, SOAPY_SDR_CF32
-
-#!/usr/bin/env python3
-"""
-Satellite Uplink Module - Sends commands to satellites using SDR and CCSDS standards
-"""
-
 
 # Try to import SDR libraries
+has_soapysdr = False
+SoapySDR = None
+SOAPY_SDR_TX = None
+SOAPY_SDR_CF32 = None
+
 try:
+    import SoapySDR
+    from SoapySDR import SOAPY_SDR_TX, SOAPY_SDR_CF32
     has_soapysdr = True
-except ImportError:
+except ImportError as e:
     has_soapysdr = False
-    logging.warning("SoapySDR not available. SDR transmission functionality limited.")
+    logging.warning(f"SoapySDR not available: {e}. SDR transmission functionality will be limited. "
+                   "To enable SDR features, install SoapySDR: https://github.com/pothosware/SoapySDR/wiki")
 
 # Configure logging
 logging.basicConfig(
@@ -160,6 +165,9 @@ class SDRTransmitter:
         """
         if self.sdr is None:
             raise UplinkException("SDR not initialized. Call setup() first.")
+        
+        if not has_soapysdr:
+            raise UplinkException("SoapySDR not available. Cannot transmit.")
         
         try:
             # Setup stream

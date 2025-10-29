@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # InfluxDB - Time series database for telemetry
+  influxdb:
+    image: influxdb:2.7
+    container_name: gsc-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpassword123
+      - DOCKER_INFLUXDB_INIT_ORG=ground-station
+      - DOCKER_INFLUXDB_INIT_BUCKET=satellite_telemetry
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=gsc-super-secret-token
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+    networks:
+      - gsc-network
+    restart: unless-stopped
+
+  # Grafana - Visualization and monitoring
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gsc-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - gsc-network
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+
+  # Ground Station Core API
+  gsc-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gsc-api
+    ports:
+      - "8000:8000"
+    environment:
+      - GSC_LATITUDE=${GSC_LATITUDE:-48.31237}
+      - GSC_LONGITUDE=${GSC_LONGITUDE:-7.44126}
+      - GSC_ALTITUDE=${GSC_ALTITUDE:-0}
+      - GSC_API_HOST=0.0.0.0
+      - GSC_API_PORT=8000
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=gsc-super-secret-token
+      - INFLUXDB_ORG=ground-station
+      - INFLUXDB_BUCKET=satellite_telemetry
+    volumes:
+      - ./config:/app/config
+      - ./results:/app/results
+      - ./data:/app/data
+    networks:
+      - gsc-network
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+    # Privileged mode needed for SDR device access
+    # Uncomment if using physical SDR hardware
+    # privileged: true
+    # devices:
+    #   - /dev/bus/usb:/dev/bus/usb
+
+networks:
+  gsc-network:
+    driver: bridge
+
+volumes:
+  influxdb-data:
+  influxdb-config:
+  grafana-data:
